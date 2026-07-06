@@ -50,9 +50,9 @@ jobs:
 
           # 5. Remote into EC2, move the file with sudo, and correct permissions
           ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST "
-            sudo mv /tmp/index.html /var/www/html/index.html && \
-            sudo chown www-data:www-data /var/www/html/index.html && \
-            sudo chmod 644 /var/www/html/index.html
+            sudo mv /tmp/index.html /var/www/html/portfolio/index.html && \
+            sudo chown www-data:www-data /var/www/html/portfolio/index.html && \
+            sudo chmod 644 /var/www/html/portfolio/index.html
           "
 
           # 6. Clean up
