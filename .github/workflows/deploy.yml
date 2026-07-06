@@ -34,7 +34,7 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           HOST: ${{ secrets.EC2_HOST }}
-          USER: admin
+          USER: ubuntu
         run: |
           # 1. Strip out carriage returns (\r) that cause the libcrypto error
           echo "$PRIVATE_KEY" | tr -d '\r' > private_key.pem
