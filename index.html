@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earvin Mondugar - Portfolio</title>
+    <style>
+        /* Catppuccin Mocha Theme Palette */
+        :root {
+            --base: #1e1e2e;
+            --mantle: #181825;
+            --text: #cdd6f4;
+            --subtext0: #a6adc8;
+            --surface1: #45475a;
+            --surface2: #585b70;
+            --overlay0: #6c7086;
+            
+            /* Accents */
+            --green: #a6e3a1;   /* Prompts / Success */
+            --blue: #89b4fa;    /* Directories / Active Tabs / Links */
+            --mauve: #cba6f7;   /* Commands / Highlights */
+            --yellow: #f9e2af;  /* Warnings / Secondary info */
+            --pink: #f5c2e7;    /* Tertiary accents */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--base);
+            color: var(--text);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Hack', ui-monospace, monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Terminal UI Elements */
+        .prompt {
+            color: var(--green);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .cmd {
+            color: var(--mauve);
+            font-weight: normal;
+        }
+
+        h1, h2, h3 {
+            font-weight: normal;
+            font-size: 1rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        a:hover {
+            background-color: var(--blue);
+            color: var(--base);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* === NOTICEABLE TAB NAVIGATION (TMUX STYLE) === */
+        .tab-nav {
+            display: flex;
+            gap: 15px;
+            margin: 2rem 0;
+            padding: 10px;
+            background-color: var(--mantle);
+            border: 1px solid var(--surface1);
+            border-left: 4px solid var(--blue);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--subtext0);
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 5px 15px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+            background-color: var(--surface1);
+        }
+
+        .tab-btn.active {
+            background-color: var(--blue);
+            color: var(--base);
+        }
+
+        .tab-btn::before {
+            content: "[ ";
+            color: inherit;
+            opacity: 0.5;
+        }
+
+        .tab-btn::after {
+            content: " ]";
+            color: inherit;
+            opacity: 0.5;
+        }
+        
+        .tab-btn.active::before, .tab-btn.active::after {
+            opacity: 1;
+        }
+
+        /* Tab Content Logic */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Lists simulating CLI Output */
+        ul {
+            list-style: none;
+        }
+
+        /* Tree Structure Styling */
+        .tree-root {
+            color: var(--blue);
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .tree-branch {
+            margin-left: 0;
+        }
+
+        .tree-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.2rem;
+        }
+
+        .tree-prefix {
+            white-space: pre;
+            color: var(--overlay0);
+            margin-right: 8px;
+        }
+
+        .tree-content {
+            flex: 1;
+        }
+        
+        .file-executable {
+            color: var(--green);
+        }
+
+        /* Image Styling (feh / fbi terminal emulator effect) */
+        img.cli-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--surface2);
+            display: block;
+            margin: 10px 0;
+            /* Catppuccin tinted monochrome filter */
+            filter: grayscale(100%) sepia(15%) hue-rotate(200deg) brightness(0.9) contrast(1.2);
+            opacity: 0.85;
+            transition: opacity 0.3s ease, border-color 0.3s ease;
+        }
+        
+        img.cli-image:hover {
+            opacity: 1;
+            border-color: var(--blue);
+        }
+
+        /* Utilities */
+        .mt-1 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        .bracket-link { font-weight: bold; }
+        .text-muted { color: var(--subtext0); }
+
+        /* Blinking Cursor */
+        .blinking-cursor {
+            color: var(--blue);
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* ls -la Table Simulation */
+        .ls-table {
+            display: grid;
+            /* First 6 columns wrap text exactly, the last column takes all remaining space */
+            grid-template-columns: max-content max-content max-content max-content max-content max-content 1fr;
+            column-gap: 1rem;
+            row-gap: 0.1rem;
+            width: 100%;
+        }
+        .ls-row {
+            display: contents; /* Makes cells act as direct grid items */
+        }
+        .ls-cell {
+            padding: 0;
+            white-space: nowrap;
+        }
+        .ls-cell:last-child {
+            white-space: normal; /* Allow skills list to wrap */
+            line-height: 1.5;
+        }
+        .ls-total-row {
+            grid-column: 1 / -1; /* Spans full width */
+            margin-bottom: 0.5rem;
+        }
+        .ls-spacer {
+            grid-column: 1 / -1; /* Spans full width */
+            height: 0.8rem;
+        }
+        
+        /* === MOBILE OPTIMIZATIONS === */
+        @media (max-width: 600px) {
+            body { 
+                font-size: 13px; 
+                padding: 12px; 
+            }
+            .tree-prefix { 
+                font-size: 13px; 
+            }
+            .tree-content { 
+                word-break: break-word; /* Prevent long paths from breaking layout */
+            }
+            
+            /* Make tab nav touch-friendly */
+            .tab-nav { 
+                flex-direction: column; 
+                gap: 8px; 
+                border-left: none; 
+                border-top: 4px solid var(--blue); 
+                padding: 15px 10px; 
+            }
+            .tab-btn {
+                width: 100%; /* Safari/iOS doesn't stretch <button> flex items by default */
+                padding: 10px;
+                text-align: left; /* Align text for stacked layout */
+            }
+
+            
+            /* Optimize ls table for mobile (inline wrapping instead of deep stacking) */
+            .ls-table { 
+                display: flex; 
+                flex-direction: column; 
+                gap: 1rem; 
+            }
+            .ls-row { 
+                display: flex; 
+                flex-direction: row; 
+                flex-wrap: wrap; 
+                gap: 0.4rem 0.8rem; 
+                padding-bottom: 0.8rem; 
+                border-bottom: 1px dashed var(--surface1); 
+            }
+            .ls-cell { 
+                white-space: normal; 
+            }
+            .ls-cell:last-child { 
+                width: 100%; /* Force the skills array/folder name to its own full-width line */
+                margin-top: 0.2rem; 
+            }
+            .ls-spacer { 
+                display: none; 
+            }
+            
+            /* Space out links for easier finger tapping */
+            header .mt-1 { 
+                line-height: 2.2; 
+            } 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER SECTION -->
+    <header>
+        <h1>
+            <span class="prompt">guest@portfolio:~$</span><span class="cmd">whoami</span>
+        </h1>
+        <p>Earvin Mondugar<br>
+        <span style="color: var(--overlay0)">></span> Bridging Development and Infrastructure | Technical Lead & Software Engineer</p>
+        
+        <div class="mt-1">
+		<!--[ <a href="https://github.com/yourusername" class="bracket-link">github</a> ] -->
+            [ <a href="https://linkedin.com/in/earvin-mondugar" class="bracket-link">linkedin</a> ] 
+            [ <a href="mailto:vinmondugar@protonmail.com" class="bracket-link">mailto</a> ]
+        </div>
+    </header>
+
+    <!-- TMUX STYLE NAVIGATION MENU -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(this, 'about-skills')">1_about_and_skills.sh</button>
+        <button class="tab-btn" onclick="switchTab(this, 'projects')">2_featured_works.sh</button>
+    </nav>
+
+    <!-- TAB 1: ABOUT & SKILLS -->
+    <main id="about-skills" class="tab-content active">
+        <section class="mb-2">
+            <h2>
+                <span class="prompt">guest@portfolio:~/about$</span><span class="cmd">cat /etc/passwd | grep earvin</span>
+            </h2>
+            <p>earvin:x:1000:1000:Tech Lead and Software Engineer transitioning towards dedicated Cloud and DevOps roles. I specialize in building scalable backends, automating deployments, and managing bare-metal to cloud infrastructure. Passionate about Linux environments, robust CI/CD pipelines, and seamless cloud integrations.:/home/earvin:/bin/bash</p>
+        </section>
+
+        <section class="mb-2">
+            <h2>
+                <span class="prompt">guest@portfolio:~/skills$</span><span class="cmd">ls -la /usr/local/bin/skills</span>
+            </h2>
+            <div class="ls-table">
+                <div class="ls-cell text-muted ls-total-row">total 12</div>
+                
+                <!-- Category 1 -->
+                <div class="ls-row">
+                    <div class="ls-cell">drwxr-xr-x</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">4096</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell" style="color: var(--blue); font-weight: bold;">infrastructure_and_cloud/</div>
+                </div>
+                <div class="ls-row text-muted">
+                    <div class="ls-cell">-rw-r--r--</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">1024</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell">[aws (ec2, rds, s3, codepipeline, codedeploy), linux_admin (debian, fedora, ubuntu, centos), virtualization (proxmox, truenas), networking (cloudflare_tunnels, routing)]</div>
+                </div>
+                
+                <!-- Spacing -->
+                <div class="ls-spacer"></div>
+                
+                <!-- Category 2 -->
+                <div class="ls-row">
+                    <div class="ls-cell">drwxr-xr-x</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">4096</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell" style="color: var(--blue); font-weight: bold;">devops_and_automation/</div>
+                </div>
+                <div class="ls-row text-muted">
+                    <div class="ls-cell">-rw-r--r--</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">512</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell">[ci_cd_pipelines, docker_containerization, infrastructure_as_code]</div>
+                </div>
+                
+                <!-- Spacing -->
+                <div class="ls-spacer"></div>
+                
+                <!-- Category 3 -->
+                <div class="ls-row">
+                    <div class="ls-cell">drwxr-xr-x</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">4096</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell" style="color: var(--blue); font-weight: bold;">development/</div>
+                </div>
+                <div class="ls-row text-muted">
+                    <div class="ls-cell">-rw-r--r--</div>
+                    <div class="ls-cell">1</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">root</div>
+                    <div class="ls-cell">2048</div>
+                    <div class="ls-cell">Jul 03 15:14</div>
+                    <div class="ls-cell">[python_fastapi, postgresql, dart_flutter]</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- TAB 2: PROJECTS -->
+    <main id="projects" class="tab-content">
+        <section class="mb-2">
+            <h2>
+                <span class="prompt">guest@portfolio:~/projects$</span><span class="cmd">tree ./featured_work</span>
+            </h2>
+            
+            <div class="tree-root">./featured_work</div>
+            
+            <div class="tree-branch">
+                <!-- Alert App -->
+                <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">cloud_native_alert_app.sh*</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Tech Lead / Cloud Architect</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Architected and deployed a production-grade emergency response system for LGUs.</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [AWS EC2, AWS S3, AWS CodeDeploy, AWS CodePipeline, AWS RDS PostgreSQL, Python/FastAPI, Flutter]</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span> 
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Designed and implemented robust CI/CD pipelines for automated testing and cloud deployment.
+                </span></div>
+                <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Architecture_Diagram:</span>
+                    <br>
+                    <img src="./assets/cloud_native_alert_app_arch.png" alt="Cloud Native Alert App Architecture" class="cli-image">
+                </span></div>
+
+                <!-- EVM Portfolio -->
+                <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">personal_career_portfolio.conf*</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> DevOps Engineer</span></div>
+                <!--<div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Bare-metal infrastructure setup for personal development, hosting, and virtualization.</span></div> -->
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [Terraform, Ansible, Cloudflare Tunnels, AWS EC2, AWS S3]</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span>
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Provisioned and managed virtual machines and LXC containers for isolated service hosting.
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Configured secure remote access and internal networking architectures.
+                </span></div>
+                <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
+                    <br>
+                    <img src="./assets/home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
+                </span></div> 
+
+                <!-- Project 2 
+                <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">home_lab_infrastructure.conf*</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Linux Systems Administrator</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Bare-metal infrastructure setup for personal development, hosting, and virtualization.</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [Proxmox, Ubuntu, Cloudflare Tunnels, Kubernetes, Docker]</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span>
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Provisioned and managed virtual machines and LXC containers for isolated service hosting.
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Configured secure remote access and internal networking architectures.
+                </span></div>
+                <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
+                    <br>
+                    <img src="./assets/home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
+                </span></div> -->
+
+                <!-- Project 3 
+                <div class="tree-item"><span class="tree-prefix">└── </span><span class="tree-content file-executable">cross_platform_dashboards.py*</span></div>
+                <div class="tree-item"><span class="tree-prefix">    ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Full Stack Developer</span></div>
+                <div class="tree-item"><span class="tree-prefix">    ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Developed comprehensive tracking applications (finance and social accounting) backed by robust APIs.</span></div>
+                <div class="tree-item"><span class="tree-prefix">    ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [Python, FastAPI, Flutter, PostgreSQL]</span></div>
+                <div class="tree-item"><span class="tree-prefix">    ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span>
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Built FastAPI backends optimized for concurrent database transactions.
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Integrated automated linting and deployment checks via CI pipelines.
+                </span></div>
+                <div class="tree-item"><span class="tree-prefix">    └── </span><span class="tree-content"><span style="color: var(--yellow)">Architecture_Diagram:</span>
+                    <br>
+                    <img src="./assets/dashboard_api_arch.png" alt="Dashboard API Architecture" class="cli-image">
+                </span></div> -->
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-1">
+        <p>
+            <span class="prompt">guest@portfolio:~$</span><span class="cmd">logout</span><br>
+            <span style="color: var(--overlay0);">System halting... © 2026. Built with code, caffeine, and Linux.</span><span class="blinking-cursor">█</span>
+        </p>
+    </footer>
+
+    <!-- TAB SWITCHING LOGIC -->
+    <script>
+        function switchTab(element, tabId) {
+            // Remove active class from all buttons and content
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button
+            element.classList.add('active');
+
+            // Show target content
+            document.getElementById(tabId).classList.add('active');
+        }
+    </script>
+</body>
+</html>
