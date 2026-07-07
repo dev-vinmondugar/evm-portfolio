@@ -424,7 +424,7 @@
                 </span></div>
                 <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Architecture_Diagram:</span>
                     <br>
-                    <img src="./assets/cloud_native_alert_app.png" alt="Cloud Native Alert App Architecture" class="cli-image">
+                    <img data-asset="cloud_native_alert_app.png" alt="Cloud Native Alert App Architecture" class="cli-image">
                 </span></div>
 
                 <!-- EVM Portfolio -->
@@ -438,7 +438,7 @@
                 </span></div>
                 <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
                     <br>
-                    <img src="./assets/home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
+                    <img data-asset="home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
                 </span></div> 
 
                 <!-- Project 2 
@@ -452,7 +452,7 @@
                 </span></div>
                 <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
                     <br>
-                    <img src="./assets/home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
+                    <img data-asset="home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
                 </span></div> -->
 
                 <!-- Project 3 
@@ -479,6 +479,23 @@
             <span style="color: var(--overlay0);">System halting... © 2026. Built with code, caffeine, and Linux.</span><span class="blinking-cursor">█</span>
         </p>
     </footer>
+
+    <!-- ASSET SOURCE RESOLUTION (local files while testing, S3 in production) -->
+    <script>
+        // Replace with your actual S3 bucket URL (e.g. https://<bucket>.s3.<region>.amazonaws.com/assets/
+        // or a CloudFront distribution URL). Must end with a trailing slash.
+        const PRODUCTION_ASSET_BASE_URL = 'https://evm-portfolio-assets.s3.ap-southeast-1.com/assets/';
+        const LOCAL_ASSET_BASE_URL = './assets/';
+
+        const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(window.location.hostname)
+            || window.location.protocol === 'file:';
+
+        const ASSET_BASE_URL = IS_LOCAL ? LOCAL_ASSET_BASE_URL : PRODUCTION_ASSET_BASE_URL;
+
+        document.querySelectorAll('img[data-asset]').forEach(img => {
+            img.src = ASSET_BASE_URL + img.dataset.asset;
+        });
+    </script>
 
     <!-- TAB SWITCHING LOGIC -->
     <script>
