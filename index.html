@@ -179,10 +179,10 @@
             border: 1px solid var(--surface2);
             display: block;
             margin: 10px 0;
-            /* Catppuccin tinted monochrome filter */
+            /* Catppuccin tinted monochrome filter 
             filter: grayscale(100%) sepia(15%) hue-rotate(200deg) brightness(0.9) contrast(1.2);
             opacity: 0.85;
-            transition: opacity 0.3s ease, border-color 0.3s ease;
+            transition: opacity 0.3s ease, border-color 0.3s ease;*/
         }
         
         img.cli-image:hover {
@@ -224,7 +224,7 @@
             white-space: nowrap;
         }
         .ls-cell:last-child {
-            white-space: normal; /* Allow skills list to wrap */
+            white-space: normal; 
             line-height: 1.5;
         }
         .ls-total-row {
@@ -246,10 +246,9 @@
                 font-size: 13px; 
             }
             .tree-content { 
-                word-break: break-word; /* Prevent long paths from breaking layout */
+                word-break: break-word; 
             }
             
-            /* Make tab nav touch-friendly */
             .tab-nav { 
                 flex-direction: column; 
                 gap: 8px; 
@@ -258,13 +257,12 @@
                 padding: 15px 10px; 
             }
             .tab-btn {
-                width: 100%; /* Safari/iOS doesn't stretch <button> flex items by default */
+                width: 100%; 
                 padding: 10px;
-                text-align: left; /* Align text for stacked layout */
+                text-align: left; 
             }
 
             
-            /* Optimize ls table for mobile (inline wrapping instead of deep stacking) */
             .ls-table { 
                 display: flex; 
                 flex-direction: column; 
@@ -415,8 +413,8 @@
             
             <div class="tree-branch">
                 <!-- Alert App -->
-                <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">cloud_native_alert_app.sh*</span></div>
-                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Tech Lead / DevOps Engineer</span></div>
+                <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">1_alert_app.sh*</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Tech Lead / Software Engineer</span></div>
                 <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Architected and deployed a production-grade emergency response system for LGUs.</span></div>
                 <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [AWS EC2, AWS S3, AWS CodeDeploy, AWS CodePipeline, AWS RDS PostgreSQL, Python/FastAPI, Flutter]</span></div>
                 <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span> 
@@ -429,17 +427,18 @@
 
                 <!-- EVM Portfolio -->
                 <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">personal_career_portfolio.conf*</span></div>
-                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> DevOps Engineer</span></div>
+                <!--<div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Role:</span> Software Engineer</span></div> -->
                 <!--<div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Desc:</span> Bare-metal infrastructure setup for personal development, hosting, and virtualization.</span></div> -->
-                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [Terraform, Ansible, Cloudflare Tunnels, AWS EC2, AWS S3, Github Actions]</span></div>
+                <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Stack:</span> [Terraform, Ansible, Cloudflare Tunnels, AWS EC2, AWS S3, Github Actions, NGINX]</span></div>
                 <div class="tree-item"><span class="tree-prefix">│   ├── </span><span class="tree-content"><span style="color: var(--yellow)">Highlights:</span>
-                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Provisioned and managed virtual machines and LXC containers for isolated service hosting.
-                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Configured secure remote access and internal networking architectures.
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Automated the creation of AWS cloud architecture using Terraform and initiated the configuration of the server using Ansible.
+                    <br><span class="text-muted">&nbsp;&nbsp;&nbsp;&nbsp;*</span> Setup an automated pipeline with Github Actions and add website security with Cloudflare through a cloudflared tunnel.
                 </span></div>
-                <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
+                <!-- <div class="tree-item"><span class="tree-prefix">│   └── </span><span class="tree-content"><span style="color: var(--yellow)">Topology_Map:</span>
                     <br>
                     <img data-asset="home_lab_topology.png" alt="Home Lab Topology" class="cli-image">
-                </span></div> 
+                </span> -->
+            </div> 
 
                 <!-- Project 2 
                 <div class="tree-item"><span class="tree-prefix">├── </span><span class="tree-content file-executable">home_lab_infrastructure.conf*</span></div>
@@ -480,10 +479,8 @@
         </p>
     </footer>
 
-    <!-- ASSET SOURCE RESOLUTION (local files while testing, S3 in production) -->
+    <!-- ASSET SOURCE CHECKING -->
     <script>
-        // Replace with your actual S3 bucket URL (e.g. https://<bucket>.s3.<region>.amazonaws.com/assets/
-        // or a CloudFront distribution URL). Must end with a trailing slash.
         const PRODUCTION_ASSET_BASE_URL = 'https://evm-portfolio-assets.s3.ap-southeast-1.amazonaws.com/assets/';
         const LOCAL_ASSET_BASE_URL = './assets/';
 
